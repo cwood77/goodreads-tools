@@ -8,9 +8,11 @@ MY_BINS = \
 	$(OUT_DIR)/debug/db.dll \
 	$(OUT_DIR)/debug/db.test.dll \
 	$(OUT_DIR)/debug/grtools.exe \
+	$(OUT_DIR)/debug/tag.dll \
 	$(OUT_DIR)/release/db.dll \
 	$(OUT_DIR)/release/db.test.dll \
 	$(OUT_DIR)/release/grtools.exe \
+	$(OUT_DIR)/release/tag.dll \
 
 # add client components to all
 all: $(MY_BINS) mono2_all
@@ -19,8 +21,10 @@ cleanLocal:
 	rm -rf $(MY_BINS)
 	rm -rf bin/obj/debug/db
 	rm -rf bin/obj/debug/grtools
+	rm -rf bin/obj/debug/tag
 	rm -rf bin/obj/release/db
 	rm -rf bin/obj/release/grtools
+	rm -rf bin/obj/release/tag
 
 .PHONY: all cleanLocal
 
@@ -94,6 +98,7 @@ GRTOOLS_SRC = \
 	src/grtools/help.cpp \
 	src/grtools/main.cpp \
 	src/grtools/verb.prepare.cpp \
+	src/grtools/verb.split.cpp \
 
 GRTOOLS_DEBUG_OBJ = $(subst src,$(OBJ_DIR)/debug,$(patsubst %.cpp,%.o,$(GRTOOLS_SRC)))
 
@@ -117,4 +122,36 @@ $(OUT_DIR)/release/grtools.exe: $(GRTOOLS_RELEASE_OBJ) $(OUT_DIR)/release/tcatli
 $(GRTOOLS_RELEASE_OBJ): $(OBJ_DIR)/release/%.o: src/%.cpp
 	$(info $< --> $@)
 	@mkdir -p $(OBJ_DIR)/release/grtools
+	@$(COMPILE_CMD) $(RELEASE_CC_FLAGS) $< -o $@
+
+# ----------------------------------------------------------------------
+# tag
+
+TAG_SRC = \
+	src/tag/api.cpp \
+	src/tag/main.cpp \
+	src/tag/wildcardExpert.cpp \
+
+TAG_DEBUG_OBJ = $(subst src,$(OBJ_DIR)/debug,$(patsubst %.cpp,%.o,$(TAG_SRC)))
+
+$(OUT_DIR)/debug/tag.dll: $(TAG_DEBUG_OBJ) $(OUT_DIR)/debug/tcatlib.lib
+	$(info $< --> $@)
+	@mkdir -p $(OUT_DIR)/debug
+	@$(LINK_CMD) -shared -o $@ $(TAG_DEBUG_OBJ) $(DEBUG_LNK_FLAGS_POST) -Lbin/out/debug -ltcatlib
+
+$(TAG_DEBUG_OBJ): $(OBJ_DIR)/debug/%.o: src/%.cpp
+	$(info $< --> $@)
+	@mkdir -p $(OBJ_DIR)/debug/tag
+	@$(COMPILE_CMD) $(DEBUG_CC_FLAGS) $< -o $@
+
+TAG_RELEASE_OBJ = $(subst src,$(OBJ_DIR)/release,$(patsubst %.cpp,%.o,$(TAG_SRC)))
+
+$(OUT_DIR)/release/tag.dll: $(TAG_RELEASE_OBJ) $(OUT_DIR)/release/tcatlib.lib
+	$(info $< --> $@)
+	@mkdir -p $(OUT_DIR)/release
+	@$(LINK_CMD) -shared -o $@ $(TAG_RELEASE_OBJ) $(RELEASE_LNK_FLAGS_POST) -Lbin/out/release -ltcatlib
+
+$(TAG_RELEASE_OBJ): $(OBJ_DIR)/release/%.o: src/%.cpp
+	$(info $< --> $@)
+	@mkdir -p $(OBJ_DIR)/release/tag
 	@$(COMPILE_CMD) $(RELEASE_CC_FLAGS) $< -o $@

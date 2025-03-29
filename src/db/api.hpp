@@ -9,6 +9,8 @@
 
 namespace db {
 
+class iFile;
+
    // TODO - cut/move comments
 // operations I need
 // - remove column
@@ -49,6 +51,7 @@ public:
    virtual ~iItem() {}
    virtual std::string& demand(const std::string& key) = 0;
    virtual const std::string& demand(const std::string& key) const = 0;
+   virtual iFile& cloneNewFile() const = 0;
 };
 
 class iFile {

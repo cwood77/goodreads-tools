@@ -29,6 +29,7 @@ public:
 
    virtual std::string& demand(const std::string& k);
    virtual const std::string& demand(const std::string& k) const;
+   virtual iFile& cloneNewFile() const;
 
    void removeColumn(const std::string& key);
 

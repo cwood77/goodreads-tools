@@ -34,6 +34,12 @@ const std::string& item::demand(const std::string& k) const
    return const_cast<item&>(*this).demand(k);
 }
 
+iFile& item::cloneNewFile() const
+{
+   throw cmn::unimplemented(cdwHere)
+      .raise();
+}
+
 void item::removeColumn(const std::string& key)
 {
    m_values.erase(key);
