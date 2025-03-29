@@ -68,6 +68,12 @@ void command::run(console::iLog& l)
    l.writeLnVerbose("removing unmaintained shelf ordering column");
    pCsvFile->removeColumn("Bookshelves with positions");
 
+   l.writeLnVerbose("sorting and dedupping tags");
+   pCsvFile->foreach([](auto& i)
+   {
+      db::listField(i.demand("Bookshelves")).sort().save();
+   });
+
    l.writeLnVerbose("saving CSV");
    dbMan->saveAs(*pCsvFile,inPath);
 }

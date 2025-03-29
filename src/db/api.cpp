@@ -19,7 +19,7 @@ void item::addNew(const std::string& k, const std::string& v)
    m_values[k] = v;
 }
 
-const std::string& item::demand(const std::string& k) const
+std::string& item::demand(const std::string& k)
 {
    auto it = m_values.find(k);
    if(it == m_values.end())
@@ -27,6 +27,11 @@ const std::string& item::demand(const std::string& k) const
          .with("key",k)
          .raise();
    return it->second;
+}
+
+const std::string& item::demand(const std::string& k) const
+{
+   return const_cast<item&>(*this).demand(k);
 }
 
 void item::removeColumn(const std::string& key)
@@ -46,6 +51,12 @@ void file::removeColumn(const std::string& key)
    m_columns.erase(m_columns.begin()+idx);
    for(auto it=m_items.begin();it!=m_items.end();++it)
       it->second->removeColumn(key);
+}
+
+void file::foreach(std::function<void(iItem&)> f)
+{
+   for(auto it=m_items.begin();it!=m_items.end();++it)
+      f(*it->second);
 }
 
 item& file::addNew(const std::string& id)

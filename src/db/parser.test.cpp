@@ -59,6 +59,18 @@ testDefineTest(fileParser_splitLine_multiWord_grescaped)
    a.assertTrue(expected == actual);
 }
 
+testDefineTest(listParser_split)
+{
+   std::set<std::string> expected;
+   expected.insert("a");
+   expected.insert("c");
+   expected.insert("multi word");
+
+   std::set<std::string> actual;
+   listParser::split("a,     multi word,c",actual);
+   a.assertTrue(expected == actual);
+}
+
 } // anonymous namespace
 } // namespace impl
 } // namespace db

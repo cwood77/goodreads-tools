@@ -23,11 +23,12 @@ inline size_t findIndex(std::vector<T>& v, const T& e)
       .raise();
 }
 
-class item {
+class item : public iItem {
 public:
    void addNew(const std::string& k, const std::string& v);
 
-   const std::string& demand(const std::string& k) const;
+   virtual std::string& demand(const std::string& k);
+   virtual const std::string& demand(const std::string& k) const;
 
    void removeColumn(const std::string& key);
 
@@ -40,6 +41,7 @@ public:
    virtual ~file();
 
    virtual void removeColumn(const std::string& key);
+   virtual void foreach(std::function<void(iItem&)> f);
 
    std::vector<std::string>& columns()             { return m_columns; }
    const std::vector<std::string>& columns() const { return m_columns; }
