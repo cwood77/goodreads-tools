@@ -6,23 +6,7 @@
 
 namespace db {
 
-#if 0
-class item {
-public:
-   std::map<std::string,std::string> values;
-};
-
-class database {
-public:
-   std::string idField;
-   std::map<std::string,item*> items;
-};
-
-class databaseEntryOrder {
-public:
-   std::list<std::string> order;
-};
-
+   // TODO - cut/move comments
 // operations I need
 // - remove column
 // - split, sort, and reform field
@@ -32,8 +16,6 @@ public:
 // - split field, and demand (or make-up) tag
 // - split field, set tag, reform
 // - merge databases
-
-#endif
 
 // --------------------------------------------------------------------------------------
 
@@ -56,8 +38,8 @@ public:
 class iFile {
 public:
    virtual ~iFile() {}
-   virtual void foreachItem(iItem& i) = 0;
-   virtual void removeColumn(const std::wstring& key) = 0;
+   //virtual void foreachItem(iItem& i) = 0;
+   //virtual void removeColumn(const std::wstring& key) = 0;
 };
 
 class iFileManager {
