@@ -38,8 +38,7 @@ public:
 class iFile {
 public:
    virtual ~iFile() {}
-   //virtual void foreachItem(iItem& i) = 0;
-   //virtual void removeColumn(const std::wstring& key) = 0;
+   virtual void removeColumn(const std::string& key) = 0;
 };
 
 class iFileManager {

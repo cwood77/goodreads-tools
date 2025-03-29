@@ -65,6 +65,9 @@ void command::run(console::iLog& l)
    tcat::typePtr<db::iFileManager> dbMan;
    std::unique_ptr<db::iFile> pCsvFile(&dbMan->load(inPath));
 
+   l.writeLnVerbose("removing unmaintained shelf ordering column");
+   pCsvFile->removeColumn("Bookshelves with positions");
+
    l.writeLnVerbose("saving CSV");
    dbMan->saveAs(*pCsvFile,inPath);
 }

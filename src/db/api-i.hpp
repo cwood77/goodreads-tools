@@ -29,6 +29,8 @@ public:
 
    const std::string& demand(const std::string& k) const;
 
+   void removeColumn(const std::string& key);
+
 private:
    std::map<std::string,std::string> m_values;
 };
@@ -36,6 +38,9 @@ private:
 class file : public iFile {
 public:
    virtual ~file();
+
+   virtual void removeColumn(const std::string& key);
+
    std::vector<std::string>& columns()             { return m_columns; }
    const std::vector<std::string>& columns() const { return m_columns; }
    item& addNew(const std::string& id);

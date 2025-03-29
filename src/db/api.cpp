@@ -29,10 +29,23 @@ const std::string& item::demand(const std::string& k) const
    return it->second;
 }
 
+void item::removeColumn(const std::string& key)
+{
+   m_values.erase(key);
+}
+
 file::~file()
 {
    for(auto it=m_items.begin();it!=m_items.end();++it)
       delete it->second;
+}
+
+void file::removeColumn(const std::string& key)
+{
+   auto idx = findIndex(m_columns,key);
+   m_columns.erase(m_columns.begin()+idx);
+   for(auto it=m_items.begin();it!=m_items.end();++it)
+      it->second->removeColumn(key);
 }
 
 item& file::addNew(const std::string& id)
