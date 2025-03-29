@@ -18,6 +18,16 @@ void item::addNew(const std::string& k, const std::string& v)
    m_values[k] = v;
 }
 
+const std::string& item::demand(const std::string& k) const
+{
+   auto it = m_values.find(k);
+   if(it == m_values.end())
+      cmn::error(cdwHere,"required field absent")
+         .with("key",k)
+         .raise();
+   return it->second;
+}
+
 file::~file()
 {
    for(auto it=m_items.begin();it!=m_items.end();++it)
@@ -34,6 +44,16 @@ item& file::addNew(const std::string& id)
    pItem = new item();
    m_order.push_back(id);
    return *pItem;
+}
+
+void file::ordered(std::function<void(const item&)> f) const
+{
+   if(m_order.size() != m_items.size())
+      cmn::error(cdwHere,"insanity")
+         .raise();
+
+   for(auto id : m_order)
+      f(*m_items[id]);
 }
 
 std::vector<std::string> lineParser::split(const std::string& line)
@@ -142,6 +162,19 @@ std::string lineFormatter::quoteIf(const std::string& s)
 void fileFormatter::format(const file& f)
 {
    lineFormatter(m_stream).append(f.columns());
+   m_stream << std::endl;
+
+   f.ordered([&](auto& i)
+   {
+      format(f.columns(),i);
+   });
+}
+
+void fileFormatter::format(const std::vector<std::string>& cols, const item& i)
+{
+   lineFormatter lf(m_stream);
+   for(auto c : cols)
+      lf.append(i.demand(c));
    m_stream << std::endl;
 }
 

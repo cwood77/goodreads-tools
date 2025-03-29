@@ -27,6 +27,8 @@ class item {
 public:
    void addNew(const std::string& k, const std::string& v);
 
+   const std::string& demand(const std::string& k) const;
+
 private:
    std::map<std::string,std::string> m_values;
 };
@@ -43,7 +45,7 @@ public:
 
 private:
    std::vector<std::string> m_columns;
-   std::map<std::string,item*> m_items;
+   mutable std::map<std::string,item*> m_items;
    std::list<std::string> m_order;
 };
 
@@ -125,6 +127,8 @@ public:
    void format(const file& f);
 
 private:
+   void format(const std::vector<std::string>& cols, const item& i);
+
    std::ostream& m_stream;
 };
 
