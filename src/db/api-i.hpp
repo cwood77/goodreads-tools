@@ -63,6 +63,8 @@ private:
    explicit lineParser(const std::string& line);
 
    void split();
+   void checkWordStart();
+   void checkWordEnd();
    void addWordIf();
    void finish();
 
@@ -71,6 +73,7 @@ private:
    const char *m_pThumb;
    const char *m_pStart;
    bool m_quoted;
+   bool m_macroQuote;
    std::vector<std::string> m_ans;
 };
 

@@ -2,6 +2,7 @@
 #include "../tcatlib/api.hpp"
 #include "api-i.hpp"
 #include "api.hpp"
+#include <cstring>
 #include <fstream>
 #include <memory>
 
@@ -67,25 +68,45 @@ lineParser::lineParser(const std::string& line)
 : m_pThumb(line.c_str())
 , m_pStart(m_pThumb)
 , m_quoted(false)
+, m_macroQuote(false)
 {
 }
 
 void lineParser::split()
 {
+   checkWordStart();
+
    for(;*m_pThumb!=0;++m_pThumb)
-      if(*m_pThumb == '"')
+   {
+      if(*m_pThumb == '"' && !m_macroQuote)
          m_quoted = !m_quoted;
       else if(*m_pThumb == ',' && !m_quoted)
          addWordIf();
+   }
 
    finish();
+}
+
+void lineParser::checkWordStart()
+{
+   if(!m_macroQuote && ::strncmp(m_pStart,"\"=\"\"",4)==0)
+      m_macroQuote = true;
+}
+
+void lineParser::checkWordEnd()
+{
+   if(m_macroQuote && ::strncmp(m_pThumb-3,"\"\"\"",3)==0)
+      m_macroQuote = false;
 }
 
 void lineParser::addWordIf()
 {
    std::string word(m_pStart,m_pThumb-m_pStart);
    m_ans.push_back(unquote(word));
+   checkWordEnd();
    m_pStart = m_pThumb+1;
+   if(*m_pThumb)
+      checkWordStart();
 }
 
 void lineParser::finish()
@@ -99,6 +120,9 @@ void lineParser::finish()
 
 std::string lineParser::unquote(const std::string& q)
 {
+   if(m_macroQuote)
+      return q;
+
    if(q.length() < 2)
       return q;
    if(q.c_str()[0] != '"')
@@ -197,13 +221,12 @@ public:
 
    virtual void mergeInto(iFile& dest, const iFile& source) const
    {
+      cmn::unimplemented(cdwHere).raise();
    }
 
    virtual void saveAs(const iFile& f, const std::string& path) const
    {
       std::ofstream fileStream(path.c_str(),std::ios::out|std::ios::binary);
-      unsigned char utf8_bom[3] = {0xEF, 0xBB, 0xBF};
-      fileStream.write(reinterpret_cast<char*>(utf8_bom), sizeof(utf8_bom));
       impl::fileFormatter(fileStream).format(dynamic_cast<const impl::file&>(f));
    }
 };
