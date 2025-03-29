@@ -1,7 +1,9 @@
 #ifndef ___db_api_i___
 #define ___db_api_i___
 
+#include "../cmn/error.hpp"
 #include "api.hpp"
+#include <functional>
 #include <map>
 #include <string>
 #include <vector>
@@ -9,22 +11,40 @@
 namespace db {
 namespace impl {
 
+template<class T>
+inline size_t findIndex(std::vector<T>& v, const T& e)
+{
+   for(size_t i=0;i<v.size();i++)
+      if(v[i] == e)
+         return i;
+
+   throw cmn::error(cdwHere,"findIndex failed")
+      .with("elt",e)
+      .raise();
+}
+
 class item {
 public:
-   void add(const std::string& k, const std::string& v);
+   void addNew(const std::string& k, const std::string& v);
 
 private:
-   std::map<std::string,std::string> values;
+   std::map<std::string,std::string> m_values;
 };
 
 class file : public iFile {
 public:
-   item& add(const std::string& id);
+   virtual ~file();
+   std::vector<std::string>& columns()             { return m_columns; }
+   const std::vector<std::string>& columns() const { return m_columns; }
+   item& addNew(const std::string& id);
+   //void reorder(const file& proto);
+
+   void ordered(std::function<void(const item&)> f) const;
 
 private:
-   const std::string idField;
-   std::map<std::string,item*> items;
-   std::list<std::string> order;
+   std::vector<std::string> m_columns;
+   std::map<std::string,item*> m_items;
+   std::list<std::string> m_order;
 };
 
 class iLineProvider {
@@ -79,10 +99,33 @@ public:
    void parse(file& f);
 
 private:
-   size_t calculateTitleIndex(std::vector<std::string>& columns) const;
    //void parseLine(const std::string& line);
 
    iLineProvider& m_lines;
+};
+
+class lineFormatter {
+public:
+   explicit lineFormatter(std::ostream& s) : m_stream(s), m_first(true) {}
+
+   lineFormatter& append(const std::string& s);
+   lineFormatter& append(const std::vector<std::string>& v);
+
+private:
+   static std::string quoteIf(const std::string& s);
+
+   std::ostream& m_stream;
+   bool m_first;
+};
+
+class fileFormatter {
+public:
+   explicit fileFormatter(std::ostream& s) : m_stream(s) {}
+
+   void format(const file& f);
+
+private:
+   std::ostream& m_stream;
 };
 
 } // namespace impl

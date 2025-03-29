@@ -8,16 +8,32 @@
 namespace db {
 namespace impl {
 
-void item::add(const std::string& k, const std::string& v)
+void item::addNew(const std::string& k, const std::string& v)
 {
-   cmn::unimplemented(cdwHere)
-      .raise();
+   auto it = m_values.find(k);
+   if(it != m_values.end())
+      cmn::error(cdwHere,"field set twice")
+         .with("key",k)
+         .raise();
+   m_values[k] = v;
 }
 
-item& file::add(const std::string& id)
+file::~file()
 {
-   throw cmn::unimplemented(cdwHere)
-      .raise();
+   for(auto it=m_items.begin();it!=m_items.end();++it)
+      delete it->second;
+}
+
+item& file::addNew(const std::string& id)
+{
+   auto*& pItem = m_items[id];
+   if(pItem)
+      throw cmn::error(cdwHere,"item added twice")
+         .with("id",id)
+         .raise();
+   pItem = new item();
+   m_order.push_back(id);
+   return *pItem;
 }
 
 std::vector<std::string> lineParser::split(const std::string& line)
@@ -47,9 +63,6 @@ void lineParser::split()
 
 void lineParser::addWordIf()
 {
-   if(m_pThumb == m_pStart)
-      return;
-
    std::string word(m_pStart,m_pThumb-m_pStart);
    m_ans.push_back(unquote(word));
    m_pStart = m_pThumb+1;
@@ -80,25 +93,56 @@ std::string lineParser::unquote(const std::string& q)
 void fileParser::parse(file& f)
 {
    auto columns = lineParser::split(m_lines.getLine());
-   auto titleIdx = calculateTitleIndex(columns);
+   auto titleIdx = findIndex(columns,std::string("Book Id"));
 
    while(!m_lines.isDone())
    {
-      auto values = lineParser::split(m_lines.getLine());
+      auto line = m_lines.getLine();
+      if(line.empty())
+         continue;
+      auto values = lineParser::split(line);
+      if(values.size() != columns.size())
+         cmn::error(cdwHere,"line has wrong element size")
+            .with("expected size",columns.size())
+            .with("actual size",values.size())
+            .raise();
       auto id = values[titleIdx];
-      auto& noob = f.add(id);
+      auto& noob = f.addNew(id);
       for(size_t i=0;i<values.size();i++)
-      {
-         if(i == titleIdx)
-            continue;
-         noob.add(columns[i],values[i]);
-      }
+         noob.addNew(columns[i],values[i]);
    }
+
+   f.columns() = columns;
 }
 
-size_t fileParser::calculateTitleIndex(std::vector<std::string>& columns) const
+lineFormatter& lineFormatter::append(const std::string& s)
 {
-   return 0;
+   if(m_first)
+      m_first = !m_first;
+   else
+      m_stream << ",";
+   m_stream << quoteIf(s);
+   return *this;
+}
+
+lineFormatter& lineFormatter::append(const std::vector<std::string>& v)
+{
+   for(auto& e : v)
+      append(e);
+   return *this;
+}
+
+std::string lineFormatter::quoteIf(const std::string& s)
+{
+   if(s.find(',') == s.npos)
+      return s;
+   return std::string("\"") + s + std::string("\"");
+}
+
+void fileFormatter::format(const file& f)
+{
+   lineFormatter(m_stream).append(f.columns());
+   m_stream << std::endl;
 }
 
 } // namespace impl
@@ -124,6 +168,10 @@ public:
 
    virtual void saveAs(const iFile& f, const std::string& path) const
    {
+      std::ofstream fileStream(path.c_str(),std::ios::out|std::ios::binary);
+      unsigned char utf8_bom[3] = {0xEF, 0xBB, 0xBF};
+      fileStream.write(reinterpret_cast<char*>(utf8_bom), sizeof(utf8_bom));
+      impl::fileFormatter(fileStream).format(dynamic_cast<const impl::file&>(f));
    }
 };
 

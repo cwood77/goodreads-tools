@@ -65,7 +65,8 @@ void command::run(console::iLog& l)
    tcat::typePtr<db::iFileManager> dbMan;
    std::unique_ptr<db::iFile> pCsvFile(&dbMan->load(inPath));
 
-   cmn::unimplemented(cdwHere).raise();
+   l.writeLnVerbose("saving CSV");
+   dbMan->saveAs(*pCsvFile,inPath);
 }
 
 } // anonymous namespace

@@ -37,6 +37,17 @@ testDefineTest(fileParser_splitLine_multiWord_escaped)
    a.assertTrue(expected == actual);
 }
 
+testDefineTest(fileParser_splitLine_multiWord_empty)
+{
+   std::vector<std::string> expected;
+   expected.push_back("");
+   expected.push_back("");
+   expected.push_back("");
+
+   std::vector<std::string> actual = lineParser::split(",,");
+   a.assertTrue(expected == actual);
+}
+
 } // anonymous namespace
 } // namespace impl
 } // namespace db
