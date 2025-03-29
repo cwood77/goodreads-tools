@@ -66,6 +66,19 @@ inline listField::listField(std::string& s)
    impl::listParser::split(m_backingStore,m_values);
 }
 
+inline listField& listField::foreach(std::function<void(const std::string&)> f)
+{
+   for(auto& e : m_values)
+      f(e);
+   return *this;
+}
+
+inline listField& listField::erase(const std::string& value)
+{
+   m_values.erase(value);
+   return *this;
+}
+
 inline listField& listField::sort()
 {
    // this does nothing, because things are already sorted by-design

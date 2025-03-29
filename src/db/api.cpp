@@ -36,8 +36,11 @@ const std::string& item::demand(const std::string& k) const
 
 iFile& item::cloneNewFile() const
 {
-   throw cmn::unimplemented(cdwHere)
-      .raise();
+   std::unique_ptr<file> pClone(new file());
+   pClone->columns() = m_file.columns();
+   auto& i = pClone->addNew(demand("Book Id"));
+   i.m_values = m_values;
+   return *pClone.release();
 }
 
 void item::removeColumn(const std::string& key)
@@ -72,7 +75,7 @@ item& file::addNew(const std::string& id)
       throw cmn::error(cdwHere,"item added twice")
          .with("id",id)
          .raise();
-   pItem = new item();
+   pItem = new item(*this);
    m_order.push_back(id);
    return *pItem;
 }

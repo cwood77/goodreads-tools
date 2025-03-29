@@ -1,16 +1,43 @@
 #include "../cmn/string.hpp"
+#include "../db/api.hpp"
 #include "../tcatlib/api.hpp"
 #include "api-i.hpp"
 #include "api.hpp"
+#include <memory>
 
 namespace tag {
 namespace impl {
 namespace {
 
-class wildcardTagBuilder : public iTagBuilder {
+class prefixTagBuilder : public iTagBuilder {
 public:
-   virtual void onValue(const std::string& v) = 0;
-   virtual iSet& build() = 0;
+   prefixTagBuilder(db::listField& f, const std::string& prefix)
+   : m_f(f), m_prefix(prefix), m_pSet(new tagSet()) {}
+
+   virtual void onValue(const std::string& v)
+   {
+      if(!cmn::startsWith(v,m_prefix))
+         return;
+      m_pSet->add(v);
+      m_f.erase(v);
+   }
+
+   virtual iSet& build()
+   {
+      addDefaultIf();
+      return *m_pSet.release();
+   }
+
+private:
+   void addDefaultIf()
+   {
+      if(m_pSet->size() == 0)
+         m_pSet->add(m_prefix + "unset");
+   }
+
+   db::listField& m_f;
+   std::string m_prefix;
+   std::unique_ptr<tagSet> m_pSet;
 };
 
 class info : public iExpertInfo {
@@ -19,7 +46,8 @@ public:
    {
       if(!cmn::endsWith(tagSyntax,"*"))
          return NULL;
-      return new expert<wildcardTagBuilder>(tagSyntax);
+      return new expert<prefixTagBuilder>(
+         std::string(tagSyntax.c_str(),tagSyntax.length()-1));
    }
 };
 

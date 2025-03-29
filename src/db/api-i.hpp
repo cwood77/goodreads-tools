@@ -11,6 +11,8 @@
 namespace db {
 namespace impl {
 
+class file;
+
 template<class T>
 inline size_t findIndex(std::vector<T>& v, const T& e)
 {
@@ -25,6 +27,8 @@ inline size_t findIndex(std::vector<T>& v, const T& e)
 
 class item : public iItem {
 public:
+   explicit item(file& f) : m_file(f) {}
+
    void addNew(const std::string& k, const std::string& v);
 
    virtual std::string& demand(const std::string& k);
@@ -34,6 +38,7 @@ public:
    void removeColumn(const std::string& key);
 
 private:
+   file& m_file;
    std::map<std::string,std::string> m_values;
 };
 

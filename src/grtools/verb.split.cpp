@@ -94,8 +94,8 @@ void command::run(console::iLog& l)
          {
             std::string fullPath = outPath + "\\" + t + "\\" + fileName;
             l.writeLnVerbose("writing book %s",fullPath.c_str());
-            cmn::unimplemented(cdwHere).raise();
             std::unique_ptr<db::iFile> pNewFile(&i.cloneNewFile());
+            fMan->createAllFoldersForFile(fullPath.c_str(),l,/*really*/true);
             dbMan->saveAs(*pNewFile,fullPath);
          });
       });

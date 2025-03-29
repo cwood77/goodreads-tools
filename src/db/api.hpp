@@ -35,9 +35,11 @@ class listField {
 public:
    explicit listField(std::string& s);
 
+   listField& foreach(std::function<void(const std::string&)> f);
    //std::list<std::string> filter(const std::string& prefix, const std::string& def) const;
    //listField& add(const std::string& value);
-   //listField& erase(const std::string& value);
+   listField& erase(const std::string& value);
+
    listField& sort();
    listField& save();
 
