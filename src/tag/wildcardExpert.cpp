@@ -46,7 +46,7 @@ public:
    {
       if(!cmn::endsWith(tagSyntax,"*"))
          return NULL;
-      return new expert<prefixTagBuilder>(
+      return new myExpert<prefixTagBuilder>(
          std::string(tagSyntax.c_str(),tagSyntax.length()-1));
    }
 };

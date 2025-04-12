@@ -8,6 +8,7 @@
 #include "../file/manager.hpp"
 #include "../tag/api.hpp"
 #include "../tcatlib/api.hpp"
+#include "../title/api.hpp"
 #include <memory>
 
 namespace {
@@ -67,15 +68,23 @@ void command::run(console::iLog& l)
    cmn::autoService<console::iLog>  _svc_l(*svcMan,l);
    cmn::autoService<sst::dict>      _svc_rc(*svcMan,pFile->dict(),"raw-config");
 
+   l.writeLnVerbose("creating managers");
+   tcat::typePtr<tag::iManager> tagMan;
+   tcat::typePtr<title::iManager> titleMan;
+
    l.writeLnVerbose("process parameters");
    std::string inPath = fMan->absolutize(oCsvPath);
    std::string outPath = fMan->absolutize(oOutFolder);
-   std::string tagSyntax = oTagSyntax.empty() ? "s-*" : oTagSyntax;
-   l.writeLnVerbose("   inPath=<%s>",inPath.c_str());
-   l.writeLnVerbose("  outPath=<%s>",outPath.c_str());
-   l.writeLnVerbose("tagSyntax=<%s>",tagSyntax.c_str());
-   tcat::typePtr<tag::iManager> tagMan;
+   std::string tagSyntax = oTagSyntax.empty() ? tagMan->getDefault() : oTagSyntax;
+   std::string titleSyntax = oTitleSyntax.empty() ? titleMan->getDefault() : oTitleSyntax;
+   l.writeLnVerbose("     inPath=<%s>",inPath.c_str());
+   l.writeLnVerbose("    outPath=<%s>",outPath.c_str());
+   l.writeLnVerbose("  tagSyntax=<%s>",tagSyntax.c_str());
+   l.writeLnVerbose("titleSyntax=<%s>",titleSyntax.c_str());
+
+   l.writeLnVerbose("creating experts");
    std::unique_ptr<tag::iExpert> pTagEx(&tagMan->createExpert(tagSyntax));
+   std::unique_ptr<title::iExpert> pTitleEx(&titleMan->createExpert(titleSyntax));
 
    l.writeLnVerbose("loading CSV");
    tcat::typePtr<db::iFileManager> dbMan;

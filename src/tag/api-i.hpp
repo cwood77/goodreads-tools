@@ -1,8 +1,8 @@
 #ifndef ___tag_api_i___
 #define ___tag_api_i___
 
-#include "../cmn/error.hpp"
 #include "../db/api.hpp"
+#include "../expert/api.hpp"
 #include "api.hpp"
 #include <set>
 #include <string>
@@ -34,9 +34,9 @@ public:
 };
 
 template<class TB>
-class expert : public iExpert {
+class myExpert : public iExpert {
 public:
-   explicit expert(const std::string& tagSyntax) : m_tagSyntax(tagSyntax) {}
+   explicit myExpert(const std::string& tagSyntax) : m_tagSyntax(tagSyntax) {}
 
    virtual iSet& removeTags(db::listField& f)
    {
@@ -50,11 +50,8 @@ private:
    const std::string m_tagSyntax;
 };
 
-class iExpertInfo {
-public:
-   virtual ~iExpertInfo() {}
-   virtual iExpert *tryCreate(const std::string& tagSyntax) const = 0;
-};
+class iExpertInfo : public expert::iExpertInfo<iExpert> {};
+typedef expert::managerHelper<iExpertInfo> managerHelper;
 
 } // namespace impl
 } // namespace tag

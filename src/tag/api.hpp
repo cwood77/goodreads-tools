@@ -23,7 +23,8 @@ public:
 class iManager {
 public:
    virtual ~iManager() {}
-   virtual iExpert& createExpert(const std::string& tagSyntax) = 0;
+   virtual std::string getDefault() const = 0;
+   virtual iExpert& createExpert(const std::string& syntax) = 0;
 };
 
 } // namespace tag
