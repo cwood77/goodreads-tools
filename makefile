@@ -9,10 +9,12 @@ MY_BINS = \
 	$(OUT_DIR)/debug/db.test.dll \
 	$(OUT_DIR)/debug/grtools.exe \
 	$(OUT_DIR)/debug/tag.dll \
+	$(OUT_DIR)/debug/title.dll \
 	$(OUT_DIR)/release/db.dll \
 	$(OUT_DIR)/release/db.test.dll \
 	$(OUT_DIR)/release/grtools.exe \
 	$(OUT_DIR)/release/tag.dll \
+	$(OUT_DIR)/release/title.dll \
 
 # add client components to all
 all: $(MY_BINS) mono2_all
@@ -22,9 +24,11 @@ cleanLocal:
 	rm -rf bin/obj/debug/db
 	rm -rf bin/obj/debug/grtools
 	rm -rf bin/obj/debug/tag
+	rm -rf bin/obj/debug/title
 	rm -rf bin/obj/release/db
 	rm -rf bin/obj/release/grtools
 	rm -rf bin/obj/release/tag
+	rm -rf bin/obj/release/title
 
 .PHONY: all cleanLocal
 
@@ -154,4 +158,36 @@ $(OUT_DIR)/release/tag.dll: $(TAG_RELEASE_OBJ) $(OUT_DIR)/release/tcatlib.lib
 $(TAG_RELEASE_OBJ): $(OBJ_DIR)/release/%.o: src/%.cpp
 	$(info $< --> $@)
 	@mkdir -p $(OBJ_DIR)/release/tag
+	@$(COMPILE_CMD) $(RELEASE_CC_FLAGS) $< -o $@
+
+# ----------------------------------------------------------------------
+# title
+
+TITLE_SRC = \
+	src/title/api.cpp \
+	src/title/default.cpp \
+	src/title/main.cpp \
+
+TITLE_DEBUG_OBJ = $(subst src,$(OBJ_DIR)/debug,$(patsubst %.cpp,%.o,$(TITLE_SRC)))
+
+$(OUT_DIR)/debug/title.dll: $(TITLE_DEBUG_OBJ) $(OUT_DIR)/debug/tcatlib.lib
+	$(info $< --> $@)
+	@mkdir -p $(OUT_DIR)/debug
+	@$(LINK_CMD) -shared -o $@ $(TITLE_DEBUG_OBJ) $(DEBUG_LNK_FLAGS_POST) -Lbin/out/debug -ltcatlib
+
+$(TITLE_DEBUG_OBJ): $(OBJ_DIR)/debug/%.o: src/%.cpp
+	$(info $< --> $@)
+	@mkdir -p $(OBJ_DIR)/debug/title
+	@$(COMPILE_CMD) $(DEBUG_CC_FLAGS) $< -o $@
+
+TITLE_RELEASE_OBJ = $(subst src,$(OBJ_DIR)/release,$(patsubst %.cpp,%.o,$(TITLE_SRC)))
+
+$(OUT_DIR)/release/title.dll: $(TITLE_RELEASE_OBJ) $(OUT_DIR)/release/tcatlib.lib
+	$(info $< --> $@)
+	@mkdir -p $(OUT_DIR)/release
+	@$(LINK_CMD) -shared -o $@ $(TITLE_RELEASE_OBJ) $(RELEASE_LNK_FLAGS_POST) -Lbin/out/release -ltcatlib
+
+$(TITLE_RELEASE_OBJ): $(OBJ_DIR)/release/%.o: src/%.cpp
+	$(info $< --> $@)
+	@mkdir -p $(OBJ_DIR)/release/title
 	@$(COMPILE_CMD) $(RELEASE_CC_FLAGS) $< -o $@

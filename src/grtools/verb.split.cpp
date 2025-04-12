@@ -95,13 +95,11 @@ void command::run(console::iLog& l)
       console::autoIndent _i(l);
       pCsvFile->foreach([&](auto& i)
       {
-         std::string fileName = i.demand("Title") + ".csv";
-
          db::listField tags(i.demand("Bookshelves"));
          std::unique_ptr<tag::iSet> pTags(&pTagEx->removeTags(tags));
          pTags->foreach([&](auto& t)
          {
-            std::string fullPath = outPath + "\\" + t + "\\" + fileName;
+            std::string fullPath = outPath + "\\" + pTitleEx->chooseName(i,t);
             l.writeLnVerbose("writing book %s",fullPath.c_str());
             std::unique_ptr<db::iFile> pNewFile(&i.cloneNewFile());
             fMan->createAllFoldersForFile(fullPath.c_str(),l,/*really*/true);

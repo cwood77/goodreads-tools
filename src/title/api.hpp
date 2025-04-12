@@ -17,7 +17,7 @@ class iManager {
 public:
    virtual ~iManager() {}
    virtual std::string getDefault() const = 0;
-   virtual iExpert& createExpert(const std::string& titleSyntax) = 0;
+   virtual iExpert& createExpert(const std::string& syntax) = 0;
 };
 
 } // namespace title

@@ -42,12 +42,12 @@ private:
 
 class info : public iExpertInfo {
 public:
-   virtual iExpert *tryCreate(const std::string& tagSyntax) const
+   virtual iExpert *tryCreate(const std::string& syntax) const
    {
-      if(!cmn::endsWith(tagSyntax,"*"))
+      if(!cmn::endsWith(syntax,"*"))
          return NULL;
       return new myExpert<prefixTagBuilder>(
-         std::string(tagSyntax.c_str(),tagSyntax.length()-1));
+         std::string(syntax.c_str(),syntax.length()-1));
    }
 };
 

@@ -8,10 +8,6 @@
 #include <string>
 
 namespace tag {
-
-class iExpert;
-class iSet;
-
 namespace impl {
 
 class tagSet : public iSet {
