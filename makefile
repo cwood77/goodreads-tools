@@ -167,6 +167,7 @@ TITLE_SRC = \
 	src/title/api.cpp \
 	src/title/default.cpp \
 	src/title/main.cpp \
+	src/title/sanitizer.cpp \
 
 TITLE_DEBUG_OBJ = $(subst src,$(OBJ_DIR)/debug,$(patsubst %.cpp,%.o,$(TITLE_SRC)))
 

@@ -2,6 +2,7 @@
 #include "../tcatlib/api.hpp"
 #include "api-i.hpp"
 #include "api.hpp"
+#include "sanitizer.hpp"
 
 namespace title {
 namespace impl {
@@ -13,8 +14,14 @@ public:
 
    virtual std::string chooseName(const db::iItem& i, const std::string& tag) const
    {
-      std::string fileName = i.demand("Title") + ".csv";
-      std::string folder = tag + "\\" + fileName;
+      std::string fileName
+         = i.demand("Title")
+         + " ("
+         + i.demand("Author")
+         + ") #"
+         + i.demand("Book Id")
+      ;
+      std::string folder = tag + "\\" + sanitize_file_word(fileName) + ".csv";
       return folder;
    }
 
