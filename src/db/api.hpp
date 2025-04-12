@@ -37,7 +37,7 @@ public:
 
    listField& foreach(std::function<void(const std::string&)> f);
    //std::list<std::string> filter(const std::string& prefix, const std::string& def) const;
-   //listField& add(const std::string& value);
+   listField& add(const std::string& value);
    listField& erase(const std::string& value);
 
    listField& sort();
@@ -67,7 +67,7 @@ class iFileManager {
 public:
    virtual ~iFileManager() {}
    virtual iFile& load(const std::string& path) const = 0;
-   virtual void mergeInto(iFile& dest, const iFile& source) const = 0;
+   virtual void updateFrom(iFile& dest, const iFile& source) const = 0;
    virtual void saveAs(const iFile& f, const std::string& path) const = 0;
 };
 

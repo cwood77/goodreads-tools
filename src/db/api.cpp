@@ -48,6 +48,11 @@ void item::removeColumn(const std::string& key)
    m_values.erase(key);
 }
 
+void item::updateFrom(const item& source)
+{
+   m_values = source.m_values;
+}
+
 file::~file()
 {
    for(auto it=m_items.begin();it!=m_items.end();++it)
@@ -88,6 +93,22 @@ void file::ordered(std::function<void(const item&)> f) const
 
    for(auto id : m_order)
       f(*m_items[id]);
+}
+
+void file::updateFrom(const file& source)
+{
+   if(m_columns != source.m_columns)
+      cmn::error(cdwHere,"columns cannot be merged")
+         .raise();
+
+   auto it = source.m_items.begin();
+   for(;it!=source.m_items.end();++it)
+   {
+      if(m_items.find(it->first) == m_items.end())
+         cmn::error(cdwHere,"new items cannot be merged")
+            .raise();
+      m_items[it->first]->updateFrom(*it->second);
+   }
 }
 
 std::vector<std::string> lineParser::split(const std::string& line)
@@ -252,9 +273,9 @@ public:
       return *pFile.release();
    }
 
-   virtual void mergeInto(iFile& dest, const iFile& source) const
+   virtual void updateFrom(iFile& dest, const iFile& source) const
    {
-      cmn::unimplemented(cdwHere).raise();
+      dynamic_cast<impl::file&>(dest).updateFrom(dynamic_cast<const impl::file&>(source));
    }
 
    virtual void saveAs(const iFile& f, const std::string& path) const

@@ -36,6 +36,7 @@ public:
    virtual iFile& cloneNewFile() const;
 
    void removeColumn(const std::string& key);
+   void updateFrom(const item& source);
 
 private:
    file& m_file;
@@ -55,6 +56,8 @@ public:
    //void reorder(const file& proto);
 
    void ordered(std::function<void(const item&)> f) const;
+
+   void updateFrom(const file& source);
 
 private:
    std::vector<std::string> m_columns;

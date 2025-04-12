@@ -8,11 +8,13 @@ MY_BINS = \
 	$(OUT_DIR)/debug/db.dll \
 	$(OUT_DIR)/debug/db.test.dll \
 	$(OUT_DIR)/debug/grtools.exe \
+	$(OUT_DIR)/debug/survey.dll \
 	$(OUT_DIR)/debug/tag.dll \
 	$(OUT_DIR)/debug/title.dll \
 	$(OUT_DIR)/release/db.dll \
 	$(OUT_DIR)/release/db.test.dll \
 	$(OUT_DIR)/release/grtools.exe \
+	$(OUT_DIR)/release/survey.dll \
 	$(OUT_DIR)/release/tag.dll \
 	$(OUT_DIR)/release/title.dll \
 
@@ -23,10 +25,12 @@ cleanLocal:
 	rm -rf $(MY_BINS)
 	rm -rf bin/obj/debug/db
 	rm -rf bin/obj/debug/grtools
+	rm -rf bin/obj/debug/survey
 	rm -rf bin/obj/debug/tag
 	rm -rf bin/obj/debug/title
 	rm -rf bin/obj/release/db
 	rm -rf bin/obj/release/grtools
+	rm -rf bin/obj/release/survey
 	rm -rf bin/obj/release/tag
 	rm -rf bin/obj/release/title
 
@@ -101,6 +105,7 @@ $(DB_TEST_RELEASE_OBJ): $(OBJ_DIR)/release/%.o: src/%.cpp
 GRTOOLS_SRC = \
 	src/grtools/help.cpp \
 	src/grtools/main.cpp \
+	src/grtools/verb.merge.cpp \
 	src/grtools/verb.prepare.cpp \
 	src/grtools/verb.split.cpp \
 
@@ -126,6 +131,37 @@ $(OUT_DIR)/release/grtools.exe: $(GRTOOLS_RELEASE_OBJ) $(OUT_DIR)/release/tcatli
 $(GRTOOLS_RELEASE_OBJ): $(OBJ_DIR)/release/%.o: src/%.cpp
 	$(info $< --> $@)
 	@mkdir -p $(OBJ_DIR)/release/grtools
+	@$(COMPILE_CMD) $(RELEASE_CC_FLAGS) $< -o $@
+
+# ----------------------------------------------------------------------
+# survey
+
+SURVEY_SRC = \
+	src/survey/main.cpp \
+	src/survey/scanner.cpp \
+
+SURVEY_DEBUG_OBJ = $(subst src,$(OBJ_DIR)/debug,$(patsubst %.cpp,%.o,$(SURVEY_SRC)))
+
+$(OUT_DIR)/debug/survey.dll: $(SURVEY_DEBUG_OBJ) $(OUT_DIR)/debug/tcatlib.lib
+	$(info $< --> $@)
+	@mkdir -p $(OUT_DIR)/debug
+	@$(LINK_CMD) -shared -o $@ $(SURVEY_DEBUG_OBJ) $(DEBUG_LNK_FLAGS_POST) -Lbin/out/debug -ltcatlib
+
+$(SURVEY_DEBUG_OBJ): $(OBJ_DIR)/debug/%.o: src/%.cpp
+	$(info $< --> $@)
+	@mkdir -p $(OBJ_DIR)/debug/survey
+	@$(COMPILE_CMD) $(DEBUG_CC_FLAGS) $< -o $@
+
+SURVEY_RELEASE_OBJ = $(subst src,$(OBJ_DIR)/release,$(patsubst %.cpp,%.o,$(SURVEY_SRC)))
+
+$(OUT_DIR)/release/survey.dll: $(SURVEY_RELEASE_OBJ) $(OUT_DIR)/release/tcatlib.lib
+	$(info $< --> $@)
+	@mkdir -p $(OUT_DIR)/release
+	@$(LINK_CMD) -shared -o $@ $(SURVEY_RELEASE_OBJ) $(RELEASE_LNK_FLAGS_POST) -Lbin/out/release -ltcatlib
+
+$(SURVEY_RELEASE_OBJ): $(OBJ_DIR)/release/%.o: src/%.cpp
+	$(info $< --> $@)
+	@mkdir -p $(OBJ_DIR)/release/survey
 	@$(COMPILE_CMD) $(RELEASE_CC_FLAGS) $< -o $@
 
 # ----------------------------------------------------------------------

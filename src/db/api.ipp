@@ -73,6 +73,12 @@ inline listField& listField::foreach(std::function<void(const std::string&)> f)
    return *this;
 }
 
+inline listField& listField::add(const std::string& value)
+{
+   m_values.insert(value);
+   return *this;
+}
+
 inline listField& listField::erase(const std::string& value)
 {
    m_values.erase(value);
