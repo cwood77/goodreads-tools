@@ -95,6 +95,9 @@ void command::run(console::iLog& l)
       l.writeLnVerbose("merging");
       dbMan->updateFrom(*pCsvFile,*pBookFile);
    });
+
+   l.writeLnVerbose("saving CSV");
+   dbMan->saveAs(*pCsvFile,inPath);
 }
 
 } // anonymous namespace
