@@ -170,6 +170,7 @@ $(SURVEY_RELEASE_OBJ): $(OBJ_DIR)/release/%.o: src/%.cpp
 TAG_SRC = \
 	src/tag/api.cpp \
 	src/tag/main.cpp \
+	src/tag/stdExpert.cpp \
 	src/tag/wildcardExpert.cpp \
 
 TAG_DEBUG_OBJ = $(subst src,$(OBJ_DIR)/debug,$(patsubst %.cpp,%.o,$(TAG_SRC)))
